@@ -4,7 +4,7 @@ import sys, os
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.Qt import Qt
 from datetime import datetime, timedelta
-import licence
+import licence, keygen_rc
 
 
 class MainWindow(QtWidgets.QDialog):
@@ -19,12 +19,15 @@ class MainWindow(QtWidgets.QDialog):
                                                     QtWidgets.QDialogButtonBox.Cancel
                                                     , self)
         self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Ok).setText(self.tr('生成'))
+        self.buttonBox.button(QtWidgets.QDialogButtonBox.Cancel).setText(self.tr('退出'))
         self.buttonBox.rejected.connect(self.reject)
         self.cwd =  os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
         mainLayout.addWidget(self.buttonBox)
         self.setLayout(mainLayout)
         self.setWindowTitle(self.tr("沃易智信注册机"))
+        self.setWindowIcon(QtGui.QIcon(':/images/app.ico'))
         self.resize(360,280)
 
     def get_lic_expr_date(self, sdate):
@@ -39,31 +42,35 @@ class MainWindow(QtWidgets.QDialog):
 
     def accept(self):
         edate = self.startdate.dateTime().toPyDateTime()
-
         licence.key_gen(self.macEdit.text(), self.productEdit.currentText(),
                         self.versionEdit.text(),
-                        edate, self.licpathEdit.text())
+                        edate, self.licpathEdit.text(),
+                        **{'edition':self.editionEdit.currentText()})
         super(MainWindow, self).accept()
 
     def reject(self):
         super(MainWindow, self).reject()
 
     def select_lic_path(self):
-        dlg = QtWidgets.QFileDialog(self)
-        dlg.setDirectory(self.cwd)
-        dlg.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
-        dlg.
-        fpath, _ = dlg.getSaveFileName(self, filter=self.tr('Licence Files (*.lic)'i)
+        fpath = os.path.join(self.cwd, '%s-%s' %(self.productEdit.currentText(), self.versionEdit.text()))
+        fpath, _ = QtWidgets.QFileDialog.getSaveFileName(self, directory=fpath,
+                                                         filter=self.tr('Licence Files (*.lic)'))
         self.licpathEdit.setText(fpath)
 
     def createMessageGroupBox(self, mlayout):
         macLabel = QtWidgets.QLabel(self.tr("机器码:"))
         self.macEdit = QtWidgets.QLineEdit(licence.get_maccode())
 
-        productLabel = QtWidgets.QLabel(self.tr("产品:"))
+        productLabel = QtWidgets.QLabel(self.tr("产品名称:"))
         self.productEdit = QtWidgets.QComboBox()
         self.productEdit.addItems(['otsweb', 'scada'])
+
+        versionLabel = QtWidgets.QLabel(self.tr("产品版本:"))
         self.versionEdit = QtWidgets.QLineEdit('1.0')
+
+        editionLabel = QtWidgets.QLabel(self.tr("产品edition:"))
+        self.editionEdit = QtWidgets.QComboBox()
+        self.editionEdit.addItems(['标准版', '企业版'])
 
         sdateLabel = QtWidgets.QLabel(self.tr("许可到期时间:"))
         self.startdate = QtWidgets.QDateTimeEdit(QtCore.QDateTime.currentDateTime())
@@ -77,21 +84,25 @@ class MainWindow(QtWidgets.QDialog):
 
         layout = QtWidgets.QGridLayout()
         layout.addWidget(macLabel, 0, 0)
-        layout.addWidget(self.macEdit, 0, 1)
+        layout.addWidget(self.macEdit, 0, 1, 1, 2)
 
         layout.addWidget(productLabel, 1, 0)
-        layout.addWidget(self.productEdit, 1, 1)
-        layout.addWidget(self.versionEdit, 1, 2)
+        layout.addWidget(self.productEdit, 1, 1, 1, 2)
 
-        layout.addWidget(sdateLabel, 2, 0)
-        layout.addWidget(self.startdate, 2, 1)
+        layout.addWidget(versionLabel, 2, 0)
+        layout.addWidget(self.versionEdit, 2, 1, 1, 2)
 
-        layout.addWidget(licpathLabel, 3, 0)
-        layout.addWidget(self.licpathEdit, 3, 1)
-        layout.addWidget(self.licpathBtn, 3, 2)
+        layout.addWidget(editionLabel, 3, 0)
+        layout.addWidget(self.editionEdit, 3, 1, 1, 2)
+
+        layout.addWidget(sdateLabel, 4, 0)
+        layout.addWidget(self.startdate, 4, 1, 1, 2)
+
+        layout.addWidget(licpathLabel, 5, 0)
+        layout.addWidget(self.licpathEdit, 5, 1)
+        layout.addWidget(self.licpathBtn, 5, 2)
 
         mlayout.addLayout(layout)
-
 
 
 

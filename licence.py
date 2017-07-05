@@ -130,10 +130,10 @@ def check_lic(licfile, pub_key):
         locrec = {
             'maccode': LicItemMatcher(
                 'maccode', get_maccode()), 'product': LicItemMatcher(
-                'product', 'otsweb'), 'expired-date': DateMatcher(
-                    'expired-date', datetime.utcfromtimestamp(
+                'product', 'otsweb'), 'expire-date': DateMatcher(
+                    'expire-date', datetime.utcfromtimestamp(
                         datetime.now().timestamp())),
-                'version': VersionMatcher('version', '1.1')}
+                'version': VersionMatcher('version', '1.0')}
         licrec = get_lic_info(licfile, pub_key)
         for k, v in locrec.items():
             v.test(licrec)
@@ -145,9 +145,9 @@ if __name__ == '__main__':
     maccode = get_maccode()
     print('machine code is %s' % (maccode,))
     product = 'otsweb'
-    enc, pub_key = key_gen(maccode, product)
-    print('key is %s' % (enc, ))
-    #_, pub_key = new_keys(product)
+    #enc, pub_key = key_gen(maccode, product)
+    #print('key is %s' % (enc, ))
+    _, pub_key = new_keys(product)
     try:
         licinfo = get_lic_info('{}.lic'.format(product), pub_key)
         print(licinfo)
