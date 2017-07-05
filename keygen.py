@@ -52,8 +52,7 @@ class MainWindow(QtWidgets.QDialog):
         dlg = QtWidgets.QFileDialog(self)
         dlg.setDirectory(self.cwd)
         dlg.setAcceptMode(QtWidgets.QFileDialog.AcceptSave)
-        dlg.
-        fpath, _ = dlg.getSaveFileName(self, filter=self.tr('Licence Files (*.lic)'i)
+        fpath, _ = dlg.getSaveFileName(self, filter=self.tr('Licence Files (*.lic)'))
         self.licpathEdit.setText(fpath)
 
     def createMessageGroupBox(self, mlayout):
